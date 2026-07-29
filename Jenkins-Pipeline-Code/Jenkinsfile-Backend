@@ -36,7 +36,7 @@ pipeline {
         stage('Trivy File Scan') {
             steps {
                 dir('Application-Code/backend') {
-                    sh 'trivy fs --format table-o  trivyfs.txt'
+                    sh 'trivy fs --format table -o  trivyfs.txt'
                 }
             }
         }
