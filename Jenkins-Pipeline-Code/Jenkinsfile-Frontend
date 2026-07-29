@@ -90,18 +90,27 @@ pipeline {
         stage('Update Deployment Manifest') {
             steps {
                 dir('Kubernetes-Manifests-file/Frontend') {
-                    sh """
-                    pwd
-                    ls -l
-                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml
 
-                    git config user.name "Nishantbadhiye"
-                    git config user.email "nishantbadhiye09@gmail.com"
+                    withCredentials([usernamePassword(
+                        credentialsId: 'github-cred',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_TOKEN'
+                    )]) {
 
-                    git add deployment.yaml
-                    git commit -m "Update frontend image to ${IMAGE_TAG}" || true
-                    git push origin main
-                    """
+                        sh """
+                        git config user.name "Nishantbadhiye"
+                        git config user.email "nishantbadhiye09@gmail.com"
+
+                        sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml
+
+                        git add deployment.yaml
+                        git commit -m "Update frontend image to ${IMAGE_TAG}" || true
+
+                        git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/Nishantbadhiye/Three-tier-application-MERN-stack-deployment.git
+
+                        git push origin main
+                        """
+                    }
                 }
             }
         }
