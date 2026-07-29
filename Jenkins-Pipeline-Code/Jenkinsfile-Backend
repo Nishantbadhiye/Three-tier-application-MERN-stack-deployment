@@ -1,50 +1,56 @@
 pipeline {
-    agent any 
+    agent any
+
     tools {
         jdk 'jdk'
         nodejs 'nodejs'
     }
-    environment  {
-        SCANNER_HOME=tool 'sonar-scanner'
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "nishantbadhiye07/backend"
     }
+
     stages {
+
         stage('Cleaning Workspace') {
             steps {
                 cleanWs()
             }
         }
+
         stage('Checkout from Git') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/Nishantbadhiye/Three-tier-application-MERN-stack-deployment.git'
             }
         }
+
         stage('Sonarqube Analysis') {
             steps {
                 dir('Application-Code/backend') {
                     withSonarQubeEnv('sonar-server') {
                         sh '''
-$SCANNER_HOME/bin/sonar-scanner \
--Dsonar.projectName=three-tier-backend \
--Dsonar.projectKey=three-tier-backend
-'''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=three-tier-backend \
+                        -Dsonar.projectKey=three-tier-backend
+                        '''
                     }
                 }
             }
         }
-        
-        
+
         stage('Trivy File Scan') {
             steps {
                 dir('Application-Code/backend') {
-                    sh """
-trivy fs --format table -o trivyfs.txt .
-"""
+                    sh '''
+                    trivy fs --format table -o trivyfs.txt .
+                    '''
                 }
             }
         }
-         stage('Build and Push Image') {
+
+        stage('Build and Push Image') {
             steps {
                 script {
                     env.IMAGE_TAG = "build-${BUILD_NUMBER}"
@@ -72,15 +78,15 @@ trivy fs --format table -o trivyfs.txt .
                 }
             }
         }
-         stage('Trivy Image Scan') {
+
+        stage('Trivy Image Scan') {
             steps {
                 sh """
                 trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
                 """
             }
         }
-        
-        
+
         stage('Update Deployment Manifest') {
             steps {
                 dir('Kubernetes-Manifests-file/Backend') {
@@ -109,9 +115,57 @@ trivy fs --format table -o trivyfs.txt .
             }
         }
     }
-}
-post {
-    always {
-        archiveArtifacts artifacts: '**/trivy*.txt', allowEmptyArchive: true
+
+    post {
+
+        always {
+            archiveArtifacts artifacts: '**/trivy*.txt', allowEmptyArchive: true
+        }
+
+        success {
+            emailext(
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Hello,
+
+The Jenkins pipeline completed successfully.
+
+Job: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+Status: SUCCESS
+
+Build URL:
+${env.BUILD_URL}
+
+Regards,
+Jenkins
+""",
+                to: "nishantbadhiye09@gmail.com"
+            )
+        }
+
+        failure {
+            emailext(
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Hello,
+
+The Jenkins pipeline has failed.
+
+Job: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+Status: FAILURE
+
+Build URL:
+${env.BUILD_URL}
+
+Please check the Jenkins console logs.
+
+Regards,
+Jenkins
+""",
+                to: "nishantbadhiye09@gmail.com"
+            )
+        }
     }
 }
