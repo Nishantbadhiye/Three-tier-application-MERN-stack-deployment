@@ -98,7 +98,7 @@ pipeline {
                     git config user.name "Nishantbadhiye"
                     git config user.email "nishantbadhiye09@gmail.com"
 
-                    git add deployment.yml
+                    git add deployment.yaml
                     git commit -m "Update frontend image to ${IMAGE_TAG}" || true
                     git push origin main
                     """
