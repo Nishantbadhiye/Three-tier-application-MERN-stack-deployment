@@ -44,7 +44,7 @@ pipeline {
             steps {
                 dir('Application-Code/frontend') {
                     sh '''
-                    trivy fs . > trivyfs.txt
+                      trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
                     '''
                 }
             }
