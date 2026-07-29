@@ -91,6 +91,8 @@ pipeline {
             steps {
                 dir('Kubernetes-Manifests-file/Frontend') {
                     sh """
+                    pwd
+                    ls -l
                     sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yml
 
                     git config user.name "Nishantbadhiye"
