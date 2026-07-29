@@ -45,7 +45,7 @@ pipeline {
                 script {
                     env.IMAGE_TAG = "build-${BUILD_NUMBER}"
 
-                    dir('Application-Code/frontend') {
+                    dir('Application-Code/backend') {
                         withCredentials([usernamePassword(
                             credentialsId: 'docker-cred',
                             usernameVariable: 'DOCKER_USER',
@@ -68,22 +68,14 @@ pipeline {
                 }
             }
         }
-        stage("ECR Image Pushing") {
-            steps {
-                script {
-                        sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}'
-                        sh 'docker tag ${AWS_ECR_REPO_NAME} ${REPOSITORY_URI}${AWS_ECR_REPO_NAME}:${BUILD_NUMBER}'
-                        sh 'docker push ${REPOSITORY_URI}${AWS_ECR_REPO_NAME}:${BUILD_NUMBER}'
-                }
-            }
-        }
-        stage('Trivy Image Scan') {
+         stage('Trivy Image Scan') {
             steps {
                 sh """
                 trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
                 """
             }
         }
+        
         
         stage('Update Deployment Manifest') {
             steps {
@@ -102,7 +94,7 @@ pipeline {
                         sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml
 
                         git add deployment.yaml
-                        git commit -m "Update frontend image to ${IMAGE_TAG}" || true
+                        git commit -m "Update backend image to ${IMAGE_TAG}" || true
 
                         git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/Nishantbadhiye/Three-tier-application-MERN-stack-deployment.git
 
