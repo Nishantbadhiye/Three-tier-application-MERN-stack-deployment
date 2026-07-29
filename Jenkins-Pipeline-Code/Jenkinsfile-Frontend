@@ -93,7 +93,7 @@ pipeline {
                     sh """
                     pwd
                     ls -l
-                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yml
+                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml
 
                     git config user.name "Nishantbadhiye"
                     git config user.email "nishantbadhiye09@gmail.com"
