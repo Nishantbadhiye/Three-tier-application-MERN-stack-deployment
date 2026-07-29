@@ -21,8 +21,8 @@ pipeline {
 
         stage('Checkout from Git') {
             steps {
-                git credentialsId: 'GITHUB',
-                    url: 'https://github.com/Nishantbadhiye/Three-tier-application-MERN-stack-deployment.git'
+                git branch: 'main', url: 'https://github.com/Nishantbadhiye/Three-tier-application-MERN-stack-deployment.git'
+                    
             }
         }
 
