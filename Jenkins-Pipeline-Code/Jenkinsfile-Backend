@@ -22,6 +22,7 @@ pipeline {
         stage('Checkout from Git') {
             steps {
                 git branch: 'main',
+                    credentialsId: 'github-cred',   // Remove if repository is public
                     url: 'https://github.com/Nishantbadhiye/Three-tier-application-MERN-stack-deployment.git'
             }
         }
@@ -56,6 +57,7 @@ pipeline {
                     env.IMAGE_TAG = "build-${BUILD_NUMBER}"
 
                     dir('Application-Code/backend') {
+
                         withCredentials([usernamePassword(
                             credentialsId: 'docker-cred',
                             usernameVariable: 'DOCKER_USER',
@@ -115,3 +117,4 @@ pipeline {
             }
         }
     }
+}
