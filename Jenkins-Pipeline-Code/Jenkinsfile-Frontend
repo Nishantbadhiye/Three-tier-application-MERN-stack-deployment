@@ -44,7 +44,7 @@ pipeline {
            steps {
               dir('Application-Code/frontend') {
                  sh '''
-                   trivy fs --format table . > trivyfs.txt
+                   trivy fs --format table -o . > trivyfs.html
                     '''
         }
     }
@@ -84,7 +84,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 sh """
-                trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
+                trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.html
                 """
             }
         }
