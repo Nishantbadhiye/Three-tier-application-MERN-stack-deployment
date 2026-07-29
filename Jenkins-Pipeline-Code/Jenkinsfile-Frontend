@@ -89,7 +89,7 @@ pipeline {
 
         stage('Update Deployment Manifest') {
             steps {
-                dir('Kubernetes-Manifests-file/Frontend/') {
+                dir('Kubernetes-Manifests-file/Frontend') {
                     sh """
                     sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yml
 
