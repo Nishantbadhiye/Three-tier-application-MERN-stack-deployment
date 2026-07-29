@@ -41,14 +41,14 @@ pipeline {
         }
 
         stage('Trivy File Scan') {
-            steps {
-                dir('Application-Code/frontend') {
-                    sh '''
-                      trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
+           steps {
+              dir('Application-Code/frontend') {
+                 sh '''
+                   trivy fs --format table . > trivyfs.txt
                     '''
-                }
-            }
         }
+    }
+} 
 
         stage('Build and Push Image') {
             steps {
@@ -84,7 +84,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 sh """
-                trivy image ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
+                trivy image --format table ${IMAGE_NAME}:${IMAGE_TAG} > trivyimage.txt
                 """
             }
         }
