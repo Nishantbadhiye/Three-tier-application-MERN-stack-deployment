@@ -24,9 +24,11 @@ pipeline {
             steps {
                 dir('Application-Code/backend') {
                     withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=three-tier-backend \
-                        -Dsonar.projectKey=three-tier-backend '''
+                        sh '''
+$SCANNER_HOME/bin/sonar-scanner \
+-Dsonar.projectName=three-tier-backend \
+-Dsonar.projectKey=three-tier-backend
+'''
                     }
                 }
             }
@@ -36,7 +38,9 @@ pipeline {
         stage('Trivy File Scan') {
             steps {
                 dir('Application-Code/backend') {
-                    sh  trivy fs --format table -o  trivyfs.txt .
+                    sh """
+trivy fs --format table -o trivyfs.txt .
+"""
                 }
             }
         }
@@ -104,5 +108,10 @@ pipeline {
                 }
             }
         }
+    }
+}
+post {
+    always {
+        archiveArtifacts artifacts: '**/trivy*.txt', allowEmptyArchive: true
     }
 }
